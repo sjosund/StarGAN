@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StarGAN</title>
+</head>
+<body>
+    <div>
+        <video autoplay style="display: None"></video>
+        <canvas id="output_1"></canvas>
+        <canvas id="output_2"></canvas>
+    </div>
+
+    <script>
+        const videoWidth = 256;
+        const videoHeight = 256;
+        const url = 'http://localhost:8501/v1/models/my_model:predict';
+
+        const canvas1 = document.getElementById('output_1');
+        const ctx1 = canvas1.getContext('2d');
+        canvas1.width = videoWidth;
+        canvas1.height = videoHeight;
+
+        const canvas2 = document.getElementById('output_2');
+        const ctx2 = canvas2.getContext('2d');
+        canvas2.width = videoWidth;
+        canvas2.height = videoHeight;
+
+        const constraints = {
+            video: true,
+            width: videoWidth,
+            height: videoHeight
+        };
+
+        const video = document.querySelector('video');
+
+        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+            video.srcObject = stream;
+            update();
+            transformUpdate();
+        });
+
+        function update() {
+            ctx1.clearRect(0, 0, videoWidth, videoHeight);
+            ctx1.save();
+            ctx1.scale(-1, 1);
+            ctx1.translate(-videoWidth, 0);
+            ctx1.drawImage(video, 0, 0, videoWidth, videoHeight);
+            ctx1.restore();
+            requestAnimationFrame(update);
+        }
+        function transformUpdate() {
+            fetch(url).then(_ => {
+                console.log('Hej!');
+                transformUpdate()
+            });
+        }
+
+    </script>
+</body>
+</html>
